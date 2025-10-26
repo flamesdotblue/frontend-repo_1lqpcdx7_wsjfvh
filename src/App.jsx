@@ -1,28 +1,37 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react';
+import TopBar, { ROLES } from './components/TopBar';
+import HeroMessage from './components/HeroMessage';
+import LinksPanel from './components/LinksPanel';
+import StoriesBoard from './components/StoriesBoard';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [role, setRole] = useState(ROLES.GUEST);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('current_role');
+      if (saved) setRole(JSON.parse(saved));
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    try { localStorage.setItem('current_role', JSON.stringify(role)); } catch {}
+  }, [role]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Vibe Coding Platform
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Your AI-powered development environment
-        </p>
-        <div className="text-center">
-          <button
-            onClick={() => setCount(count + 1)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-          >
-            Count is {count}
-          </button>
+    <div className="min-h-screen flex flex-col">
+      <TopBar role={role} onRoleChange={setRole} />
+      <main className="flex-1">
+        <HeroMessage role={role} />
+        <LinksPanel role={role} />
+        <StoriesBoard role={role} />
+      </main>
+      <footer className="border-t border-gray-200 bg-white">
+        <div className="max-w-6xl mx-auto px-4 py-6 text-sm text-gray-500 flex items-center justify-between">
+          <p>© {new Date().getFullYear()} Testimony Hub</p>
+          <p className="text-xs">Responsive by default — optimized for phones, tablets, and desktops.</p>
         </div>
-      </div>
+      </footer>
     </div>
-  )
+  );
 }
-
-export default App
